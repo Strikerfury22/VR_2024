@@ -20,7 +20,7 @@ public class MovePlayer : MonoBehaviour
     space : Moves camera on X and Z axis only.  So camera doesn't gain any height*/
 
 
-    float mainSpeed = 0.5f; //regular speed
+    float mainSpeed = 0.1f; //regular speed
     float shiftAdd = 0.01f; //multiplied by how long shift is held.  Basically running
     float maxShift = 0.08f; //Maximum speed when holdin gshift
     //float camSens = 0.25f; //How sensitive it with mouse
@@ -48,6 +48,9 @@ public class MovePlayer : MonoBehaviour
     [SerializeField] private bool moveAlongside = false;
     private bool triggered = false;
 
+    //Moving variables
+    [SerializeField] private bool flyingMode = true;
+
 
     // Start is called before the first frame update
     void Start()
@@ -70,21 +73,40 @@ public class MovePlayer : MonoBehaviour
     private Vector3 GetBaseInput()
     { //returns the basic values, if it's 0 than it's not active.
         Vector3 p_Velocity = new Vector3();
-        if (Input.GetKey(KeyCode.W))
-        {
-            p_Velocity += new Vector3(0, 0, 0.1f);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            p_Velocity += new Vector3(0, 0, -0.1f);
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            p_Velocity += new Vector3(-0.1f, 0, 0);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            p_Velocity += new Vector3(0.1f, 0, 0);
+        if (!flyingMode) { 
+            if (Input.GetKey(KeyCode.W))
+            {
+                p_Velocity += new Vector3(0, 0, 0.1f);
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                p_Velocity += new Vector3(0, 0, -0.1f);
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                p_Velocity += new Vector3(-0.1f, 0, 0);
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                p_Velocity += new Vector3(0.1f, 0, 0);
+            }
+        } else {
+            if (Input.GetKey(KeyCode.W))
+            {
+                p_Velocity += new Vector3(0, 0.1f, 0);
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                p_Velocity += new Vector3(0, -0.1f, 0);
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                p_Velocity += new Vector3(-0.1f, 0, 0);
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                p_Velocity += new Vector3(0.1f, 0, 0);
+            }
         }
         return p_Velocity;
     }
@@ -140,8 +162,11 @@ public class MovePlayer : MonoBehaviour
         }
         //Aplicamos el movimiento como si no hubiese rotacion en X ni en Z
         var auxiliar = transform.eulerAngles;
-        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0.0f);
-
+        if (!flyingMode) { 
+            transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0.0f);
+        } else {
+            transform.eulerAngles = new Vector3(0, 0.0f, 0.0f);
+        }
         //Teleport movement
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.T))
         { //If left click
@@ -188,8 +213,11 @@ public class MovePlayer : MonoBehaviour
                 totalRun += Time.deltaTime;
                 p = p * totalRun * shiftAdd;
                 p.x = Mathf.Clamp(p.x, -maxShift, maxShift);
-                //p.y = Mathf.Clamp(p.y, -maxShift, maxShift);
-                p.z = Mathf.Clamp(p.z, -maxShift, maxShift);
+                if (flyingMode) { 
+                    p.y = Mathf.Clamp(p.y, -maxShift, maxShift);
+                } else { 
+                    p.z = Mathf.Clamp(p.z, -maxShift, maxShift);
+                }
             }
             else
             {
