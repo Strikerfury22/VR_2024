@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -20,7 +22,7 @@ public class MovePlayer : MonoBehaviour
     space : Moves camera on X and Z axis only.  So camera doesn't gain any height*/
 
 
-    float mainSpeed = 0.1f; //regular speed
+    float mainSpeed = 0.2f; //regular speed
     float shiftAdd = 0.01f; //multiplied by how long shift is held.  Basically running
     float maxShift = 0.08f; //Maximum speed when holdin gshift
     //float camSens = 0.25f; //How sensitive it with mouse
@@ -33,7 +35,7 @@ public class MovePlayer : MonoBehaviour
     // Coger pelotas
     bool isHolding = false;
     GameObject item = null;
-    float throwForce = 30.0f;
+    float throwForce = 100.0f;
     Vector3 objectPos;
     float distance;
 
@@ -43,31 +45,53 @@ public class MovePlayer : MonoBehaviour
     bool checkCollisions = true;
 
     //Teleport variables
-    float distanceMultiplier = 5.0f;
-    [SerializeField] private Transform targetTeleport = null;
-    [SerializeField] private bool moveAlongside = false;
-    private bool triggered = false;
+    //float distanceMultiplier = 5.0f;
+    //[SerializeField] private Transform targetTeleport = null;
+    //[SerializeField] private bool moveAlongside = false;
+    //private bool triggered = false;
 
     //Moving variables
     [SerializeField] private bool flyingMode = true;
+
+    //Respecto a las flechas
+    [SerializeField] private int numFlechas = 1;
+    private GameObject flechaActual = null;
+    [SerializeField] private GameObject flechaData = null;
+    [SerializeField] private Transform posicionArco = null;
+    //private Vector3 posicionFlechaDisparo = Vector3.zero;
+    //private Vector3 rotacionFlechaDisparo = Vector3.zero;
+    [SerializeField] private TMP_Text messageText; // Dice el número de flechas disponibles
+
+    //Sonido de carga
+    [SerializeField] AudioSource source;
+    [SerializeField] AudioClip charge1;
+    [SerializeField] AudioClip charge2;
+    float timeCounter = 0.0f;
+    bool cargando = false;
+    const float chargeTime = 1f;
+    const int maxCharges = 2;
+    int numCharges = 0;
+
 
 
     // Start is called before the first frame update
     void Start()
     {
-        targetTeleport.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+        //targetTeleport.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+        //posicionFlechaDisparo = flechaActual.transform.localPosition;
+        //rotacionFlechaDisparo = flechaActual.transform.localEulerAngles;
+        //flechaData = flechaActual;
+        //Debug.Log(posicionFlechaDisparo);
+        isHolding = true;
+        SpawnArrow();
+
     }
     void OnCollisionEnter(Collision obj)
     {
-        if (obj.gameObject.tag == "Spheres" && checkCollisions)
+        if (obj.gameObject.tag == "FlechaAgarrable")
         {
-            item = obj.gameObject;
-            item.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.75f;
-            isHolding = true;
-            item.GetComponent<Rigidbody>().useGravity = false;
-            item.GetComponent<Rigidbody>().detectCollisions = true;
-            checkCollisions = false;
-            time = -1.0f;
+            Destroy(obj.gameObject);
+            numFlechas++;
         }
     }
     private Vector3 GetBaseInput()
@@ -111,96 +135,95 @@ public class MovePlayer : MonoBehaviour
         return p_Velocity;
     }
 
+    public void SpawnArrow()
+    {
+        // Instantiate the object
+        //Instantiate(flechaData, pos, Quaternion.identity);
+        Debug.Log("Arco Recargado");
+        flechaActual = Instantiate(flechaData, this.transform);
+        flechaActual.transform.localPosition = posicionArco.localPosition;// + Camera.main.transform.up * 0.75f; //posicionFlechaDisparo;
+        //flechaActual.transform.eulerAngles = rotacionFlechaDisparo;
+        flechaActual.GetComponent<Rigidbody>().useGravity = false;
+        flechaActual.GetComponent<Rigidbody>().detectCollisions = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        // Catch the ball
-        if (item != null)
+        ////////////////////////////////Disparo de flecha
+        if (isHolding && flechaActual != null)
         {
-            distance = Vector3.Distance(item.transform.position,
-            transform.position);
-            if (distance >= 1.5f)
-            {
-                isHolding = false;
-            }
-            if (isHolding)
-            {
-                item.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                item.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                item.transform.SetParent(transform); //Necesario especificarlo en cada iteración
+            //flechaActual.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            //flechaActual.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            //flechaActual.transform.localPosition = posicionFlechaDisparo;
+            //flechaActual.transform.localEulerAngles = rotacionFlechaDisparo;
 
-                if (Input.GetKey("z"))
-                {
-                    time = 0.0f;
-                    //Throw
-                    var cam = Camera.main;
-                    item.GetComponent<Rigidbody>().AddForce(cam.transform.forward * throwForce);
-                    item.GetComponent<Rigidbody>().useGravity = true;
-                    isHolding = false;
-                    item.transform.SetParent(null);
-                    item = null;
-                }
-            }
-            /*else {
-                objectPos = item.transform.position;
-                item.transform.SetParent(null);
-                item.GetComponent<Rigidbody>().useGravity = true;
-                item.transform.position = objectPos;
-            }*/
-        }
-        else
-        { //Nuestro código para evitar atrapar la bola tras lanzarla
-            if (!checkCollisions && time > -1.0f)
+            if (cargando)
             {
-                time += Time.deltaTime;
-                if (time >= waitTime)
-                {
-                    time = -1.0f;
-                    checkCollisions = true;
+                flechaActual.transform.localPosition = new Vector3(posicionArco.localPosition.x, posicionArco.localPosition.y, posicionArco.localPosition.z - 0.05f*(numCharges+1));
+            } else {
+                flechaActual.transform.localPosition = posicionArco.localPosition;
+            }
+            if (Input.GetKeyDown("z")) //Se presiona el boton de disparo
+            {
+                timeCounter = 0.0f;
+                cargando = true;
+                //flechaActual.transform.localPosition = new Vector3(flechaActual.transform.localPosition.x, flechaActual.transform.localPosition.y, flechaActual.transform.localPosition.z -0.1f);
+            } else if(Input.GetKeyUp("z")) { // Se dispara
+                time = 0.0f;
+                //Throw
+                flechaActual.GetComponent<Rigidbody>().AddForce(flechaActual.transform.forward * throwForce * (numCharges+1));
+                flechaActual.GetComponent<Rigidbody>().useGravity = true;
+                flechaActual.GetComponent<Rigidbody>().detectCollisions = true;
+                flechaActual.transform.SetParent(null);
+                flechaActual.tag = "FlechaVolando";
+                // Marcamos que no tenemos flechas
+                isHolding = false;
+                flechaActual = null;
+                cargando = false;
+                numFlechas--;
+                numCharges = 0;
+            } else if (cargando) // No se ha soltado el boton de disparo
+            {
+                timeCounter += Time.deltaTime;
+                if (timeCounter > chargeTime && numCharges < maxCharges) {
+                    timeCounter = 0.0f;
+                    if(numCharges == 0)
+                    {
+                        source.PlayOneShot(charge1);
+                    } else
+                    {
+                        source.PlayOneShot(charge2);
+                    }
+                    numCharges++;
                 }
             }
+        } else
+        {
+            if(numFlechas > 0) {
+                isHolding = true;
+                SpawnArrow();
+            }
         }
+
+        //Escribimos numero de flechas restantes
+        messageText.SetText("Flechas: "+(numFlechas).ToString()); // donde podemos actualizar el texto
+
+
+        /*else {
+            objectPos = item.transform.position;
+            item.transform.SetParent(null);
+            item.GetComponent<Rigidbody>().useGravity = true;
+            item.transform.position = objectPos;
+        }*/
+
+        /////////////////////////////////////////////////////////Movimiento del jugador
         //Aplicamos el movimiento como si no hubiese rotacion en X ni en Z
         var auxiliar = transform.eulerAngles;
         if (!flyingMode) { 
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0.0f);
         } else {
             transform.eulerAngles = new Vector3(0, 0.0f, 0.0f);
-        }
-        //Teleport movement
-        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.T))
-        { //If left click
-            if (triggered)
-            {
-                //transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + 1);
-                //transform.Translate(Vector3.forward * distanceMultiplier); //Esta linea es la MT-0
-               // if (moveAlongside)
-               // {
-               //     targetTeleport.SetParent(null);
-               // }
-                transform.localPosition = new Vector3(targetTeleport.localPosition.x, transform.localPosition.y, targetTeleport.localPosition.z);
-
-                targetTeleport.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-                triggered = false;
-            }
-            else
-            {
-                triggered = true;
-                targetTeleport.localScale = new Vector3(0.2f, 0.01f, 0.2f);
-                targetTeleport.position = new Vector3(transform.position.x, -0.15f, transform.position.z);
-                targetTeleport.eulerAngles = transform.eulerAngles;
-                targetTeleport.Translate(Vector3.forward * distanceMultiplier);
-                //if (moveAlongside) //No lo mantiene en el suelo
-                //{
-                 //   targetTeleport.SetParent(transform);
-                //}
-            }
-        }
-        if (triggered && moveAlongside)
-        {
-            targetTeleport.position = new Vector3(transform.position.x, -0.15f, transform.position.z);
-            targetTeleport.eulerAngles = transform.eulerAngles;
-            targetTeleport.Translate(Vector3.forward * distanceMultiplier);
         }
 
         //WASD movement
@@ -233,5 +256,5 @@ public class MovePlayer : MonoBehaviour
         var direction = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0.0f);
         var euler = transform.eulerAngles + direction * rotationSpeed * 50;
         transform.eulerAngles = euler;
-    } 
+    }
 }

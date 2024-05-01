@@ -3,12 +3,17 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Flecha
+  - Enganchable
+  - FlechaAgarrable
+  - FlechaVolando
+  - TARGET
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Interactive
   - Water
   - UI
   - 
