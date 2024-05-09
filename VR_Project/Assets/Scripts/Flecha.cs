@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 //using static UnityEditor.Progress;
 
@@ -13,18 +14,19 @@ public class Flecha : MonoBehaviour
     [SerializeField] AudioSource source;
     [SerializeField] AudioClip hit;
     [SerializeField] AudioClip miss;
+    private int counter = 0;
     //private bool esAgarrable = false;
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(tag == "FlechaVolando") {
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x+0.1f, transform.eulerAngles.y, transform.eulerAngles.z);
+        //if(tag == "FlechaVolando") {
+            //transform.eulerAngles = new Vector3(transform.eulerAngles.x+0.01f, transform.eulerAngles.y, transform.eulerAngles.z);
+            //transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
             /*if (primeraMedida) {
                 velocidadInicial = GetComponent<Rigidbody>().velocity;
                 anguloInicial = transform.eulerAngles;
@@ -40,6 +42,17 @@ public class Flecha : MonoBehaviour
             //if (transform.eulerAngles.x > angMax || transform.eulerAngles.x < 0){
             //    transform.eulerAngles = new Vector3(angMax, transform.eulerAngles.y, transform.eulerAngles.z);
             //}
+        //}
+    }
+
+    void FixedUpdate(){
+        if (tag == "FlechaVolando")
+        {
+            //transform.eulerAngles = new Vector3(transform.eulerAngles.x+0.01f, transform.eulerAngles.y, transform.eulerAngles.z);
+            if (counter > 5)
+                transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
+            else
+                counter++;
         }
     }
 
@@ -70,6 +83,13 @@ public class Flecha : MonoBehaviour
             GetComponent<Rigidbody>().isKinematic = true;
             // Marcamos que la flecha se ha enganchado a algo y que el jugador la puede recoger.
             enganchado = true;
+        }
+        if (obj.gameObject.tag == "Vacio" && !enganchado)
+        {
+            Debug.Log("HIT Void");
+            // Marcamos que la flecha se ha enganchado a algo y que el jugador la puede recoger.
+            enganchado = true;
+            Destroy(gameObject);
         }
     }
 

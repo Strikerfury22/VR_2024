@@ -13,7 +13,7 @@ public class MovePlayer_Headset : MonoBehaviour
 
 
 
-    float mainSpeed = 0.35f; //regular speed
+    float mainSpeed = 1f;//0.35f; //regular speed
     //float shiftAdd = 0.01f; //multiplied by how long shift is held.  Basically running
     //float maxShift = 0.08f; //Maximum speed when holdin gshift
     //float camSens = 0.25f; //How sensitive it with mouse
@@ -27,6 +27,7 @@ public class MovePlayer_Headset : MonoBehaviour
     bool isHolding = false;
     GameObject item = null;
     float throwForce = 100.0f;
+    float bonusThrow = 25.0f;
     Vector3 objectPos;
     float distance;
 
@@ -83,6 +84,12 @@ public class MovePlayer_Headset : MonoBehaviour
         {
             Destroy(obj.gameObject);
             numFlechas++;
+        }
+        if (obj.gameObject.tag == "Vacio")
+        {
+            //Coordenadas iniciales del jugador
+            transform.position = new Vector3(-4.81f, 0.31f, 0f);
+            transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
         }
     }
     private Vector3 GetBaseInput()
@@ -164,7 +171,7 @@ public class MovePlayer_Headset : MonoBehaviour
             } else if(!Input.anyKey && cargando) { // Se dispara
                 
                 //Throw
-                flechaActual.GetComponent<Rigidbody>().AddForce(flechaActual.transform.forward * throwForce * (numCharges + 1));
+                flechaActual.GetComponent<Rigidbody>().AddForce(flechaActual.transform.forward * (throwForce + bonusThrow * (numCharges + 1)));
                 flechaActual.GetComponent<Rigidbody>().useGravity = true;
                 flechaActual.GetComponent<Rigidbody>().detectCollisions = true;
                 flechaActual.transform.SetParent(null);
@@ -212,10 +219,17 @@ public class MovePlayer_Headset : MonoBehaviour
 
         /////////////////////////////////////////////////////////Movimiento del jugador
         //Aplicamos el movimiento como si no hubiese rotacion en X ni en Z
+        
+    }
+    private void FixedUpdate()
+    {
         var auxiliar = transform.eulerAngles;
-        if (!flyingMode) { 
+        if (!flyingMode)
+        {
             transform.eulerAngles = new Vector3(0, Camera.main.transform.eulerAngles.y, 0.0f);
-        } else {
+        }
+        else
+        {
             transform.eulerAngles = new Vector3(0, 0.0f, 0.0f);
         }
 

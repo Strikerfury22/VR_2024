@@ -7,11 +7,15 @@ public class Target : MonoBehaviour
     [SerializeField] AudioSource source;
     [SerializeField] AudioClip hit;
     [SerializeField] Transform toDelete = null;
+    [SerializeField] Transform toUpdate = null;
+    [SerializeField] private int puntos = 100;
     private bool triggered = false;
+    private Score puntuacion;
+    
     // Start is called before the first frame update
     void Start()
     {
-
+        puntuacion = GameObject.Find("Puntuacion").GetComponent<Score>();
     }
 
     // Update is called once per frame
@@ -26,9 +30,10 @@ public class Target : MonoBehaviour
         {
             obj.gameObject.tag = "FlechaAgarrable";
             source.PlayOneShot(hit);
-            if (!triggered) { 
+            if (!triggered) {
+                puntuacion.updateScore(puntos);
                 triggered = true;
-                toDelete.SetLocalPositionAndRotation(new Vector3(toDelete.position.x, toDelete.position.y + 4, toDelete.position.z), toDelete.rotation);
+                toDelete.SetLocalPositionAndRotation(new Vector3(toDelete.localPosition.x + toUpdate.localPosition.x, toDelete.localPosition.y + toUpdate.localPosition.y, toDelete.localPosition.z + toUpdate.localPosition.z), toDelete.localRotation);
             }
         }
     }

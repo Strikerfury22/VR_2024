@@ -22,20 +22,21 @@ public class MovePlayer : MonoBehaviour
     space : Moves camera on X and Z axis only.  So camera doesn't gain any height*/
 
 
-    float mainSpeed = 0.2f; //regular speed
+    float mainSpeed = 1f;//0.2f; //regular speed
     float shiftAdd = 0.01f; //multiplied by how long shift is held.  Basically running
     float maxShift = 0.08f; //Maximum speed when holdin gshift
     //float camSens = 0.25f; //How sensitive it with mouse
     //private Vector3 lastMouse = new Vector3(255, 255, 255); //kind of in the middle of the screen, rather than at the top (play)
-    private float totalRun = 1.0f;
+    private float totalRun = 1f;
 
-    private float rotationSpeed = 0.05f; //Para la rotación
+    private float rotationSpeed = 0.05f;// 0.05f; //Para la rotación
 
 
     // Coger pelotas
     bool isHolding = false;
     GameObject item = null;
     float throwForce = 100.0f;
+    float bonusThrow = 25.0f;
     Vector3 objectPos;
     float distance;
 
@@ -93,6 +94,11 @@ public class MovePlayer : MonoBehaviour
             Destroy(obj.gameObject);
             numFlechas++;
         }
+        if (obj.gameObject.tag == "Vacio")
+        {
+            transform.position = new Vector3(-4.81f, 0.31f, 0f);
+            transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
+        }
     }
     private Vector3 GetBaseInput()
     { //returns the basic values, if it's 0 than it's not active.
@@ -140,14 +146,13 @@ public class MovePlayer : MonoBehaviour
         // Instantiate the object
         //Instantiate(flechaData, pos, Quaternion.identity);
         Debug.Log("Arco Recargado");
-        flechaActual = Instantiate(flechaData, this.transform);
+        flechaActual = Instantiate(flechaData, Camera.main.transform);
         flechaActual.transform.localPosition = posicionArco.localPosition;// + Camera.main.transform.up * 0.75f; //posicionFlechaDisparo;
         //flechaActual.transform.eulerAngles = rotacionFlechaDisparo;
         flechaActual.GetComponent<Rigidbody>().useGravity = false;
         flechaActual.GetComponent<Rigidbody>().detectCollisions = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         ////////////////////////////////Disparo de flecha
@@ -160,8 +165,10 @@ public class MovePlayer : MonoBehaviour
 
             if (cargando)
             {
-                flechaActual.transform.localPosition = new Vector3(posicionArco.localPosition.x, posicionArco.localPosition.y, posicionArco.localPosition.z - 0.05f*(numCharges+1));
-            } else {
+                flechaActual.transform.localPosition = new Vector3(posicionArco.localPosition.x, posicionArco.localPosition.y, posicionArco.localPosition.z - 0.05f * (numCharges + 1));
+            }
+            else
+            {
                 flechaActual.transform.localPosition = posicionArco.localPosition;
             }
             if (Input.GetKeyDown("z")) //Se presiona el boton de disparo
@@ -169,10 +176,12 @@ public class MovePlayer : MonoBehaviour
                 timeCounter = 0.0f;
                 cargando = true;
                 //flechaActual.transform.localPosition = new Vector3(flechaActual.transform.localPosition.x, flechaActual.transform.localPosition.y, flechaActual.transform.localPosition.z -0.1f);
-            } else if(Input.GetKeyUp("z")) { // Se dispara
+            }
+            else if (Input.GetKeyUp("z"))
+            { // Se dispara
                 time = 0.0f;
                 //Throw
-                flechaActual.GetComponent<Rigidbody>().AddForce(flechaActual.transform.forward * throwForce * (numCharges+1));
+                flechaActual.GetComponent<Rigidbody>().AddForce(flechaActual.transform.forward * (throwForce + bonusThrow * (numCharges + 1)));
                 flechaActual.GetComponent<Rigidbody>().useGravity = true;
                 flechaActual.GetComponent<Rigidbody>().detectCollisions = true;
                 flechaActual.transform.SetParent(null);
@@ -183,32 +192,47 @@ public class MovePlayer : MonoBehaviour
                 cargando = false;
                 numFlechas--;
                 numCharges = 0;
-            } else if (cargando) // No se ha soltado el boton de disparo
+            }
+            else if (cargando) // No se ha soltado el boton de disparo
             {
                 timeCounter += Time.deltaTime;
-                if (timeCounter > chargeTime && numCharges < maxCharges) {
+                if (timeCounter > chargeTime && numCharges < maxCharges)
+                {
                     timeCounter = 0.0f;
-                    if(numCharges == 0)
+                    if (numCharges == 0)
                     {
                         source.PlayOneShot(charge1);
-                    } else
+                    }
+                    else
                     {
                         source.PlayOneShot(charge2);
                     }
                     numCharges++;
                 }
             }
-        } else
+        }
+        else
         {
-            if(numFlechas > 0) {
+            if (numFlechas > 0)
+            {
                 isHolding = true;
                 SpawnArrow();
             }
         }
 
         //Escribimos numero de flechas restantes
-        messageText.SetText("Flechas: "+(numFlechas).ToString()); // donde podemos actualizar el texto
+        messageText.SetText("Flechas: " + (numFlechas).ToString()); // donde podemos actualizar el texto
 
+        //Rotation
+        var direction = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0.0f);
+        var euler = transform.eulerAngles + direction * rotationSpeed * 50;
+        transform.eulerAngles = euler;
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        
 
         /*else {
             objectPos = item.transform.position;
@@ -253,8 +277,5 @@ public class MovePlayer : MonoBehaviour
         //Recuperamos la rotación
         transform.eulerAngles = auxiliar;
 
-        var direction = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0.0f);
-        var euler = transform.eulerAngles + direction * rotationSpeed * 50;
-        transform.eulerAngles = euler;
     }
 }

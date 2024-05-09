@@ -9,6 +9,7 @@ TagManager:
   - FlechaAgarrable
   - FlechaVolando
   - TARGET
+  - Vacio
   layers:
   - Default
   - TransparentFX
