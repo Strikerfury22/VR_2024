@@ -10,6 +10,7 @@ TagManager:
   - FlechaVolando
   - TARGET
   - Vacio
+  - Vacio2
   layers:
   - Default
   - TransparentFX

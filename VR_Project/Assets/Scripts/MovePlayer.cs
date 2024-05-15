@@ -65,13 +65,19 @@ public class MovePlayer : MonoBehaviour
 
     //Sonido de carga
     [SerializeField] AudioSource source;
+    [SerializeField] AudioClip charge0;
     [SerializeField] AudioClip charge1;
     [SerializeField] AudioClip charge2;
+    [SerializeField] AudioClip fail;
     float timeCounter = 0.0f;
     bool cargando = false;
     const float chargeTime = 1f;
     const int maxCharges = 2;
     int numCharges = 0;
+
+    //Puntuacion
+    private Score puntuacion;
+    private int penalizacion = 50;
 
 
 
@@ -84,6 +90,7 @@ public class MovePlayer : MonoBehaviour
         //flechaData = flechaActual;
         //Debug.Log(posicionFlechaDisparo);
         isHolding = true;
+        puntuacion = GameObject.Find("Puntuacion").GetComponent<Score>();
         SpawnArrow();
 
     }
@@ -97,7 +104,15 @@ public class MovePlayer : MonoBehaviour
         if (obj.gameObject.tag == "Vacio")
         {
             transform.position = new Vector3(-4.81f, 0.31f, 0f);
-            transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
+            source.PlayOneShot(fail);
+            //transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
+        }
+        if (obj.gameObject.tag == "Vacio2")
+        {
+            transform.position = new Vector3(13.6f, 15.08f, -26f);
+            puntuacion.updateScore(penalizacion);
+            source.PlayOneShot(fail);
+            //transform.eulerAngles = new Vector3(0f, -90.705f, 0f);
         }
     }
     private Vector3 GetBaseInput()
@@ -175,6 +190,7 @@ public class MovePlayer : MonoBehaviour
             {
                 timeCounter = 0.0f;
                 cargando = true;
+                source.PlayOneShot(charge0);
                 //flechaActual.transform.localPosition = new Vector3(flechaActual.transform.localPosition.x, flechaActual.transform.localPosition.y, flechaActual.transform.localPosition.z -0.1f);
             }
             else if (Input.GetKeyUp("z"))

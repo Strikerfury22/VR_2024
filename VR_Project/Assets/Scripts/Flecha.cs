@@ -15,6 +15,10 @@ public class Flecha : MonoBehaviour
     [SerializeField] AudioClip hit;
     [SerializeField] AudioClip miss;
     private int counter = 0;
+
+    private Vector3 tamanoReal = new Vector3(0.09999998f, 2f, 0.1f);
+    [SerializeField] GameObject blinkingBody = null;
+    private bool notMade = true;
     //private bool esAgarrable = false;
     // Start is called before the first frame update
     void Start()
@@ -43,6 +47,14 @@ public class Flecha : MonoBehaviour
             //    transform.eulerAngles = new Vector3(angMax, transform.eulerAngles.y, transform.eulerAngles.z);
             //}
         //}
+        if(tag == "FlechaAgarrable" && notMade)
+        {
+            blinkingBody.GetComponent<MeshRenderer>().material.SetInteger("_enabled",1);
+            blinkingBody.GetComponent<Transform>().localScale = tamanoReal;
+            notMade= false;
+        } else if (notMade) {
+            blinkingBody.GetComponent<MeshRenderer>().material.SetInteger("_enabled", 0);
+        }
     }
 
     void FixedUpdate(){
@@ -58,7 +70,7 @@ public class Flecha : MonoBehaviour
 
     void OnCollisionEnter(Collision obj)
     {
-        if (obj.gameObject.tag == "Enganchable" && !enganchado)
+        if ((obj.gameObject.tag == "Enganchable" || obj.gameObject.tag == "Vacio2") && !enganchado)
         {
             source.PlayOneShot(miss);
             Debug.Log("HIT");
