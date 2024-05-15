@@ -77,7 +77,7 @@ public class MovePlayer : MonoBehaviour
 
     //Puntuacion
     private Score puntuacion;
-    private int penalizacion = 50;
+    private int penalizacion = -50;
 
 
 
