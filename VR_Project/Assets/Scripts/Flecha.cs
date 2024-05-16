@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 //using static UnityEditor.Progress;
 
 public class Flecha : MonoBehaviour
@@ -70,7 +71,7 @@ public class Flecha : MonoBehaviour
 
     void OnCollisionEnter(Collision obj)
     {
-        if ((obj.gameObject.tag == "Enganchable" || obj.gameObject.tag == "Vacio2") && !enganchado)
+        if ((obj.gameObject.tag == "Enganchable" || obj.gameObject.tag == "Vacio2" || obj.gameObject.tag == "InicioVuelo") && !enganchado)
         {
             source.PlayOneShot(miss);
             Debug.Log("HIT");
@@ -103,6 +104,31 @@ public class Flecha : MonoBehaviour
             enganchado = true;
             Destroy(gameObject);
         }
+        /*if (obj.gameObject.tag == "Empezar" && !enganchado)
+        {
+            //Debug.Log("HIT TARGET");
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            GetComponent<Rigidbody>().useGravity = false;
+            GetComponent<Rigidbody>().detectCollisions = true;
+            GetComponent<Rigidbody>().freezeRotation = true;
+            GetComponent<Rigidbody>().isKinematic = true;
+        }
+        if (obj.gameObject.tag == "Salir" && !enganchado)
+        {
+            Debug.Log("HIT EXIT");
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            GetComponent<Rigidbody>().useGravity = false;
+            GetComponent<Rigidbody>().detectCollisions = true;
+            GetComponent<Rigidbody>().freezeRotation = true;
+            GetComponent<Rigidbody>().isKinematic = true;
+            //Application.Quit();
+            AndroidJavaObject activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
+            activity.Call<bool>("moveTaskToBack", true);
+            // Marcamos que la flecha se ha enganchado a algo y que el jugador la puede recoger.
+            enganchado = true;
+        }*/
     }
 
     /*bool puedoCogerla() {

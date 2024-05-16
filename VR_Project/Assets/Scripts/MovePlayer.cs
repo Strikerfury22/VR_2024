@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 //using static UnityEditor.Progress;
 
@@ -52,10 +54,14 @@ public class MovePlayer : MonoBehaviour
     //private bool triggered = false;
 
     //Moving variables
-    [SerializeField] private bool flyingMode = true;
+    [SerializeField] private bool flyingMode = false;
+    private bool startigFlight = false;
+    float mainSpeedFlight = 1f;
+    //float mainSpeedFlightTwo = 2f;
 
     //Respecto a las flechas
     [SerializeField] private int numFlechas = 1;
+    //private int auxNumFlechas = 0;
     private GameObject flechaActual = null;
     [SerializeField] private GameObject flechaData = null;
     [SerializeField] private Transform posicionArco = null;
@@ -89,9 +95,9 @@ public class MovePlayer : MonoBehaviour
         //rotacionFlechaDisparo = flechaActual.transform.localEulerAngles;
         //flechaData = flechaActual;
         //Debug.Log(posicionFlechaDisparo);
-        isHolding = true;
+        //isHolding = true;
         puntuacion = GameObject.Find("Puntuacion").GetComponent<Score>();
-        SpawnArrow();
+        //SpawnArrow();
 
     }
     void OnCollisionEnter(Collision obj)
@@ -104,7 +110,12 @@ public class MovePlayer : MonoBehaviour
         if (obj.gameObject.tag == "Vacio")
         {
             transform.position = new Vector3(-4.81f, 0.31f, 0f);
+            puntuacion.updateScore(penalizacion);
             source.PlayOneShot(fail);
+            if (Score.getScore() < 0 && numFlechas <= 0)
+            {
+                SceneManager.LoadScene("LoadScene");
+            }
             //transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
         }
         if (obj.gameObject.tag == "Vacio2")
@@ -112,7 +123,27 @@ public class MovePlayer : MonoBehaviour
             transform.position = new Vector3(13.6f, 15.08f, -26f);
             puntuacion.updateScore(penalizacion);
             source.PlayOneShot(fail);
+            if (Score.getScore() < 0 && numFlechas <= 0)
+            {
+                SceneManager.LoadScene("LoadScene");
+            }
             //transform.eulerAngles = new Vector3(0f, -90.705f, 0f);
+        }
+        if (obj.gameObject.tag == "InicioVuelo" && !startigFlight)
+        {
+            startigFlight = true;
+            //Por alguna razón, si no hacemos esto la primera flecha que se dispara desde que se empieza a volar se buggea
+
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            GetComponent<Rigidbody>().useGravity = false;
+            //GetComponent<Rigidbody>().isKinematic = true;
+        }
+        if (obj.gameObject.tag == "Meta")
+        {
+            puntuacion.updateScore(numFlechas * 50);
+            numFlechas = 0;
+            SceneManager.LoadScene("LoadScene");
         }
     }
     private Vector3 GetBaseInput()
@@ -146,11 +177,11 @@ public class MovePlayer : MonoBehaviour
             }
             if (Input.GetKey(KeyCode.A))
             {
-                p_Velocity += new Vector3(-0.1f, 0, 0);
+                p_Velocity += new Vector3(0, 0, -0.1f);
             }
             if (Input.GetKey(KeyCode.D))
             {
-                p_Velocity += new Vector3(0.1f, 0, 0);
+                p_Velocity += new Vector3(0, 0, 0.1f);
             }
         }
         return p_Velocity;
@@ -160,7 +191,7 @@ public class MovePlayer : MonoBehaviour
     {
         // Instantiate the object
         //Instantiate(flechaData, pos, Quaternion.identity);
-        Debug.Log("Arco Recargado");
+        //Debug.Log("Arco Recargado");
         flechaActual = Instantiate(flechaData, Camera.main.transform);
         flechaActual.transform.localPosition = posicionArco.localPosition;// + Camera.main.transform.up * 0.75f; //posicionFlechaDisparo;
         //flechaActual.transform.eulerAngles = rotacionFlechaDisparo;
@@ -198,6 +229,7 @@ public class MovePlayer : MonoBehaviour
                 time = 0.0f;
                 //Throw
                 flechaActual.GetComponent<Rigidbody>().AddForce(flechaActual.transform.forward * (throwForce + bonusThrow * (numCharges + 1)));
+                UnityEngine.Debug.Log(flechaActual.transform.forward * (throwForce + bonusThrow * (numCharges + 1)));
                 flechaActual.GetComponent<Rigidbody>().useGravity = true;
                 flechaActual.GetComponent<Rigidbody>().detectCollisions = true;
                 flechaActual.transform.SetParent(null);
@@ -259,11 +291,28 @@ public class MovePlayer : MonoBehaviour
 
         /////////////////////////////////////////////////////////Movimiento del jugador
         //Aplicamos el movimiento como si no hubiese rotacion en X ni en Z
+        if (startigFlight && !flyingMode)
+        {
+            if(transform.position.y > 15.08f)
+            {
+                flyingMode = true;
+                
+            } else {
+                transform.Translate(new Vector3(0, 0.1f * mainSpeedFlight , 0));
+            }
+            return;
+        }
+
         var auxiliar = transform.eulerAngles;
         if (!flyingMode) { 
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0.0f);
         } else {
-            transform.eulerAngles = new Vector3(0, 0.0f, 0.0f);
+            //For the automatic forward displacement
+            transform.eulerAngles = new Vector3(0, 180f, 0.0f);
+            transform.Translate(new Vector3(0.1f * mainSpeedFlight, 0, 0));
+
+            //For the manual displacement
+            transform.eulerAngles = new Vector3(0, 0f, 0.0f);
         }
 
         //WASD movement
@@ -271,21 +320,12 @@ public class MovePlayer : MonoBehaviour
         Vector3 p = GetBaseInput();
         if (p.sqrMagnitude > 0)
         { // only move while a direction key is pressed
-            if (Input.GetKey(KeyCode.LeftShift))
+            if(!flyingMode)
             {
-                totalRun += Time.deltaTime;
-                p = p * totalRun * shiftAdd;
-                p.x = Mathf.Clamp(p.x, -maxShift, maxShift);
-                if (flyingMode) { 
-                    p.y = Mathf.Clamp(p.y, -maxShift, maxShift);
-                } else { 
-                    p.z = Mathf.Clamp(p.z, -maxShift, maxShift);
-                }
-            }
-            else
-            {
-                totalRun = Mathf.Clamp(totalRun * 0.5f, 1f, 1000f);
                 p = p * mainSpeed;
+            } else
+            {
+                p = p * (mainSpeedFlight*1.5f);
             }
             transform.Translate(p);
 

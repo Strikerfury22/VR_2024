@@ -5,6 +5,7 @@ using System.Drawing;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 //using static UnityEditor.Progress;
 
@@ -44,6 +45,8 @@ public class MovePlayer_Headset : MonoBehaviour
 
     //Moving variables
     [SerializeField] private bool flyingMode = true;
+    private bool startigFlight = false;
+    float mainSpeedFlight = 1f; //1f;//1.5f;//2f;
 
     //Respecto a las flechas
     [SerializeField] private int numFlechas = 1;
@@ -56,13 +59,19 @@ public class MovePlayer_Headset : MonoBehaviour
 
     //Sonido de carga
     [SerializeField] AudioSource source;
+    [SerializeField] AudioClip charge0;
     [SerializeField] AudioClip charge1;
     [SerializeField] AudioClip charge2;
+    [SerializeField] AudioClip fail;
     float timeCounter = 0.0f;
     bool cargando = false;
     const float chargeTime = 1f;
     const int maxCharges = 2;
     int numCharges = 0;
+
+    //Puntuacion
+    private Score puntuacion;
+    private int penalizacion = -50;
 
 
 
@@ -74,8 +83,9 @@ public class MovePlayer_Headset : MonoBehaviour
         //rotacionFlechaDisparo = flechaActual.transform.localEulerAngles;
         //flechaData = flechaActual;
         //Debug.Log(posicionFlechaDisparo);
-        isHolding = true;
-        SpawnArrow();
+        //isHolding = true;
+        //SpawnArrow();
+        puntuacion = GameObject.Find("Puntuacion").GetComponent<Score>();
 
     }
     void OnCollisionEnter(Collision obj)
@@ -87,15 +97,48 @@ public class MovePlayer_Headset : MonoBehaviour
         }
         if (obj.gameObject.tag == "Vacio")
         {
-            //Coordenadas iniciales del jugador
             transform.position = new Vector3(-4.81f, 0.31f, 0f);
-            transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
+            puntuacion.updateScore(penalizacion);
+            source.PlayOneShot(fail);
+            if (Score.getScore() < 0 && numFlechas <= 0)
+            {
+                SceneManager.LoadScene("LoadScene");
+            }
+            //transform.eulerAngles = new Vector3(0f, 90.705f, 0f);
+        }
+        if (obj.gameObject.tag == "Vacio2")
+        {
+            transform.position = new Vector3(13.6f, 15.08f, -26f);
+            puntuacion.updateScore(penalizacion);
+            source.PlayOneShot(fail);
+            if (Score.getScore() < 0 && numFlechas <= 0)
+            {
+                SceneManager.LoadScene("LoadScene");
+            }
+            //transform.eulerAngles = new Vector3(0f, -90.705f, 0f);
+        }
+        if (obj.gameObject.tag == "InicioVuelo" && !startigFlight)
+        {
+            startigFlight = true;
+            //Por alguna razón, si no hacemos esto la primera flecha que se dispara desde que se empieza a volar se buggea
+
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            GetComponent<Rigidbody>().useGravity = false;
+            //GetComponent<Rigidbody>().isKinematic = true;
+        }
+        if (obj.gameObject.tag == "Meta")
+        {
+            puntuacion.updateScore(numFlechas * 50);
+            numFlechas = 0;
+            SceneManager.LoadScene("LoadScene");
         }
     }
     private Vector3 GetBaseInput()
     { //returns the basic values, if it's 0 than it's not active.
         Vector3 p_Velocity = new Vector3();
-        if (!flyingMode) { 
+        if (!flyingMode)
+        {
             if (Input.GetAxis("Vertical") > 0)
             {
                 p_Velocity += new Vector3(0, 0, 0.1f);
@@ -112,7 +155,9 @@ public class MovePlayer_Headset : MonoBehaviour
             {
                 p_Velocity += new Vector3(0.1f, 0, 0);
             }
-        } else {
+        }
+        else
+        {
             if (Input.GetAxis("Vertical") > 0)
             {
                 p_Velocity += new Vector3(0, 0.1f, 0);
@@ -123,11 +168,11 @@ public class MovePlayer_Headset : MonoBehaviour
             }
             if (Input.GetAxis("Horizontal") < 0)
             {
-                p_Velocity += new Vector3(-0.1f, 0, 0);
+                p_Velocity += new Vector3(0, 0, -0.1f);
             }
             if (Input.GetAxis("Horizontal") > 0)
             {
-                p_Velocity += new Vector3(0.1f, 0, 0);
+                p_Velocity += new Vector3(0, 0, 0.1f);
             }
         }
         return p_Velocity;
@@ -137,7 +182,7 @@ public class MovePlayer_Headset : MonoBehaviour
     {
         // Instantiate the object
         //Instantiate(flechaData, pos, Quaternion.identity);
-        Debug.Log("Arco Recargado");
+        //Debug.Log("Arco Recargado");
         flechaActual = Instantiate(flechaData, Camera.main.transform);
         flechaActual.transform.localPosition = posicionArco.localPosition;// + Camera.main.transform.up * 0.75f; //posicionFlechaDisparo;
         //flechaActual.transform.eulerAngles = rotacionFlechaDisparo;
@@ -166,6 +211,7 @@ public class MovePlayer_Headset : MonoBehaviour
             {
                 timeCounter = 0.0f; //No hay anyKeyUp
                 cargando = true;
+                source.PlayOneShot(charge0);
                 //Throw
                 //flechaActual.transform.localPosition = new Vector3(flechaActual.transform.localPosition.x, flechaActual.transform.localPosition.y, flechaActual.transform.localPosition.z -0.1f);
             } else if(!Input.anyKey && cargando) { // Se dispara
@@ -223,6 +269,18 @@ public class MovePlayer_Headset : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (startigFlight && !flyingMode)
+        {
+            if (transform.position.y > 15.08f)
+            {
+                flyingMode = true;
+            }
+            else
+            {
+                transform.Translate(new Vector3(0, 0.1f * mainSpeedFlight, 0));
+            }
+            return;
+        }
         var auxiliar = transform.eulerAngles;
         if (!flyingMode)
         {
@@ -230,7 +288,12 @@ public class MovePlayer_Headset : MonoBehaviour
         }
         else
         {
-            transform.eulerAngles = new Vector3(0, 0.0f, 0.0f);
+            //For the automatic forward displacement
+            transform.eulerAngles = new Vector3(0, 180f, 0.0f);
+            transform.Translate(new Vector3(0.1f * mainSpeedFlight, 0, 0));
+
+            //For the manual displacement
+            transform.eulerAngles = new Vector3(0, 0f, 0.0f);
         }
 
         //WASD movement
@@ -238,9 +301,14 @@ public class MovePlayer_Headset : MonoBehaviour
         Vector3 p = GetBaseInput();
         if (p.sqrMagnitude > 0)
         { // only move while a direction key is pressed
-            totalRun = Mathf.Clamp(totalRun * 0.5f, 1f, 1000f);
-            p = p * mainSpeed;
-
+            if (!flyingMode)
+            {
+                p = p * mainSpeed;
+            }
+            else
+            {
+                p = p * (mainSpeedFlight * 1.5f);
+            }
             transform.Translate(p);
 
         }

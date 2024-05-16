@@ -5,12 +5,12 @@ using TMPro;
 
 public class Score : MonoBehaviour
 {
-    private int puntuacion;
+    private static int puntuacion = 0;
     [SerializeField] private TMP_Text messageText;
     // Start is called before the first frame update
     void Start()
     {
-        puntuacion = 0;
+        //puntuacion = 0;
         messageText.SetText("Puntuación: " + (puntuacion).ToString());
     }
 
@@ -19,7 +19,15 @@ public class Score : MonoBehaviour
     {
         
     }
-
+    public static int getScore()
+    {
+        return puntuacion;
+    }
+    public static void setScore(int score)
+    {
+        Debug.Log("Value set");
+        puntuacion = score;
+    }
     public void updateScore(int addedScore) {
         puntuacion += addedScore;
         messageText.SetText("Puntuación: " + (puntuacion).ToString());
