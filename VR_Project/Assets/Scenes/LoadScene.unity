@@ -2697,10 +2697,10 @@ MonoBehaviour:
   posicionArco: {fileID: 1023326342}
   messageText: {fileID: 1193050622}
   source: {fileID: 1023326339}
-  charge0: {fileID: 0}
+  charge0: {fileID: 8300000, guid: 6e26e0f2d5bcd0443874a5b8175c7ad1, type: 3}
   charge1: {fileID: 8300000, guid: 940e9ee925deaf241a339b96241f23c0, type: 3}
   charge2: {fileID: 8300000, guid: 08d4d3a6a5134a943a3e11d1322910c9, type: 3}
-  fail: {fileID: 0}
+  fail: {fileID: 8300000, guid: 7412e9281ae79d0449ddf6e72aa770a9, type: 3}
 --- !u!114 &2138778187
 MonoBehaviour:
   m_ObjectHideFlags: 0

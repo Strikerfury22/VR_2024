@@ -46,7 +46,7 @@ public class MovePlayer_Headset : MonoBehaviour
     //Moving variables
     [SerializeField] private bool flyingMode = true;
     private bool startigFlight = false;
-    float mainSpeedFlight = 1f; //1f;//1.5f;//2f;
+    float mainSpeedFlight = 2f; //1f;//1.5f;//2f;//2.5f;//3f;
 
     //Respecto a las flechas
     [SerializeField] private int numFlechas = 1;

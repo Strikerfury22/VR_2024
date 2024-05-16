@@ -147,7 +147,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 84
+  controlID: 46
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 85
+  controlID: 47
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 86
+  controlID: 48
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -217,8 +217,8 @@ MonoBehaviour:
     y: 0
     width: 429.6
     height: 333.6
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -356,7 +356,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scenes
+    - Assets/sounds
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -364,16 +364,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 85
   m_LastFolders:
-  - Assets/Scenes
+  - Assets/sounds
   m_LastFoldersGridSize: 85
   m_LastProjectPath: C:\Users\FX506\Desktop\Estudios\Master\github\VR_2024\VR_Project
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 9c780000
-    m_LastClickedID: 30876
-    m_ExpandedIDs: 000000006a7800006c7800006e78000094780000
+    m_SelectedIDs: 8a860000
+    m_LastClickedID: 34442
+    m_ExpandedIDs: 00000000628600006486000066860000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -401,7 +401,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 54590000
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000006a7800006c7800006e780000
+    m_ExpandedIDs: 00000000628600006486000066860000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -496,7 +496,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 3c9bfcff769bfcff88a3fcff5ca4fcffa4aafcffdeaafcfff0b2fcffc4b3fcff28cefcff62cefcff78d6fcff50d7fcff70ebfcffe4ecfcff5017fdffc018fdff581bfdffd23ffdffdc3ffdff7041fdffc647fdffb249fdffae51fdffe851fdffba58fdff9259fdff6c60fdffa0b0fdff04c2fdff6ae1feff2ae8feffa809ffff4412ffff6275fffffe7fffff1686ffffd087fffff48effff7ca8ffff7ea8ffffdca8fffffaadffff6eb3ffffdab7ffff26fbffff605e0000fc690000aa6a0000ac6b0000086c00005e710000087300009875000046e4000074ee000096f10000d0f10000e6f2000082f400002afe0000b40b0100ea0e0100d0160100e016010084870200848902000e8a020078a302003ca40200508c0400888c04009c8c0400d88c040064a6050002b305000ede05004ade0500c0df050058ed050072f0050044f4050072f605001a1306008a13060026290600c8370600
+      m_ExpandedIDs: f674ffff3475ffff467dffff1a7effff6884ffffa684ffffb88cffff8c8dffffc693ffff0494ffff169cffffea9cffff2ca3ffff6aa3ffff7cabffff50acffff92b2ffffd0b2ffffe6baffffbebbffff9ac3ffff12c9ffff4cc9ffff5ed1ffff32d2ffff74d8ffffaed8ffffc0e0ffff94e1ffffa8e8ffffe2e8fffff8f0ffffd0f1ffff90f3ffff26fbffff6c310100
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
