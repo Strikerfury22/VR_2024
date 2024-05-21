@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LoadingCube
-  m_Shader: {fileID: 4800000, guid: aa46700e9f8396f4cbb7de18fd73b74c, type: 3}
+  m_Shader: {fileID: 4800000, guid: 3a78bdf66d3e6704cb1b625b2168c6d4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -77,7 +77,9 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
+    - _alpha: 0.6
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _customColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

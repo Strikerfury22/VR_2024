@@ -24,8 +24,10 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints:
-    - _enabled: 0
-    m_Floats: []
+    - _enabled: 1
+    m_Floats:
+    - _percentage: 0
+    - _value: 0
     m_Colors:
-    - _customColor: {r: 1, g: 1, b: 1, a: 1}
+    - _customColor: {r: 0.94716984, g: 0.18923669, b: 0, a: 1}
   m_BuildTextureStacks: []

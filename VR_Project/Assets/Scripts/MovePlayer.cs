@@ -56,7 +56,7 @@ public class MovePlayer : MonoBehaviour
     //Moving variables
     [SerializeField] private bool flyingMode = false;
     private bool startigFlight = false;
-    float mainSpeedFlight = 1f;
+    float mainSpeedFlight = 2f;
     //float mainSpeedFlightTwo = 2f;
 
     //Respecto a las flechas
@@ -75,6 +75,7 @@ public class MovePlayer : MonoBehaviour
     [SerializeField] AudioClip charge1;
     [SerializeField] AudioClip charge2;
     [SerializeField] AudioClip fail;
+    [SerializeField] AudioClip grab;
     float timeCounter = 0.0f;
     bool cargando = false;
     const float chargeTime = 1f;
@@ -105,6 +106,7 @@ public class MovePlayer : MonoBehaviour
         if (obj.gameObject.tag == "FlechaAgarrable")
         {
             Destroy(obj.gameObject);
+            source.PlayOneShot(grab);
             numFlechas++;
         }
         if (obj.gameObject.tag == "Vacio")
@@ -145,6 +147,31 @@ public class MovePlayer : MonoBehaviour
             numFlechas = 0;
             SceneManager.LoadScene("LoadScene");
         }
+        //Discarded version of the limits (more "general" regarding that it could be generalized more easierly, but the other way works smoothier for the player sight)
+        /*if (obj.gameObject.tag == "LowerBound")
+        {
+            UnityEngine.Debug.Log("Hit low");
+            transform.position = new Vector3(transform.position.x, -1.5f, transform.position.z);
+            GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x,0f,GetComponent<Rigidbody>().velocity.z);
+        }
+        if (obj.gameObject.tag == "UpperBound")
+        {
+            transform.position = new Vector3(transform.position.x, 21.5f, transform.position.z);
+            GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x, 0f, GetComponent<Rigidbody>().velocity.z);
+            UnityEngine.Debug.Log("Hit up");
+        }
+        if (obj.gameObject.tag == "LeftBound")
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y, -39.57f);
+            GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x, GetComponent<Rigidbody>().velocity.y, 0f);
+            UnityEngine.Debug.Log("Hit left");
+        }
+        if (obj.gameObject.tag == "RightBound")
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y, -12.5f);
+            GetComponent<Rigidbody>().velocity = new Vector3(GetComponent<Rigidbody>().velocity.x, GetComponent<Rigidbody>().velocity.y, 0f);
+            UnityEngine.Debug.Log("Hit Right");
+        }*/
     }
     private Vector3 GetBaseInput()
     { //returns the basic values, if it's 0 than it's not active.
@@ -275,6 +302,25 @@ public class MovePlayer : MonoBehaviour
         var direction = new Vector3(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0.0f);
         var euler = transform.eulerAngles + direction * rotationSpeed * 50;
         transform.eulerAngles = euler;
+        if (flyingMode)
+        {
+            if (transform.position.y < -1.964189f)
+            {
+                transform.position = new Vector3(transform.position.x, -1.964189f, transform.position.z);
+            }
+            if (transform.position.y > 24.03581f)
+            {
+                transform.position = new Vector3(transform.position.x, 24.03581f, transform.position.z);
+            }
+            if (transform.position.z < -40.97f)
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y, -40.97f);
+            }
+            if (transform.position.z > -12.8f)
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y, -12.8f);
+            }
+        }
     }
 
     // Update is called once per frame

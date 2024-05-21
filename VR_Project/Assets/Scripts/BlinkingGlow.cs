@@ -25,7 +25,8 @@ public class BlinkingGlow : MonoBehaviour
             if (timer < 0) { brilla = true; timer = 0; }
         }
         //meshRenderer.material.SetInteger("_enabled", 1);
-        meshRenderer.material.SetColor("_customColor", new Color(timer / waitTime, timer / waitTime, timer / waitTime));
-        
+        //meshRenderer.material.SetColor("_customColor", new Color(timer / waitTime, timer / waitTime, timer / waitTime));
+        meshRenderer.material.SetFloat("_percentage", timer / waitTime);
+
     }
 }

@@ -11,6 +11,13 @@ TagManager:
   - TARGET
   - Vacio
   - Vacio2
+  - InicioVuelo
+  - Empezar
+  - Meta
+  - LowerBound
+  - UpperBound
+  - RightBound
+  - LeftBound
   layers:
   - Default
   - TransparentFX

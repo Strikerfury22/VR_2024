@@ -4,6 +4,7 @@ Shader "Custom/Glowing Shader"
     Properties
     {
         [HDR] _customColor("Glow color", Color) = (1,1,1,1)
+        _percentage("porcentaje", Range(0,1)) = 0.0
         //_customColor("Main color", Color) = (1,1,1,1)
         _enabled("Emits light", Integer) = 0
     }
@@ -19,6 +20,7 @@ Shader "Custom/Glowing Shader"
         };
 
         fixed4 _customColor;
+        float _percentage;
         uint _enabled;
         void surf(Input IN, inout SurfaceOutputStandard o)
         {
@@ -37,10 +39,10 @@ Shader "Custom/Glowing Shader"
                 }
             }*/
             if (_enabled == 1) {
-                o.Emission = _customColor.rgb;// _customColor.rgb;// true; // Vi que existia en el por defecto, probé y existía. No he encontrado documentación.
+                o.Emission = _customColor.rgb * _percentage;// _customColor.rgb;// true; // Vi que existia en el por defecto, probé y existía. No he encontrado documentación.
             }
             else {
-                o.Albedo = _customColor.rgb;
+               // o.Albedo = _customColor.rgb;
             }
             
         }
